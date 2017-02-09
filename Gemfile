@@ -45,7 +45,7 @@ gem 'httparty', '~> 0.14.0'
 gem 'semantic-ui-sass', '~> 2.2', '>= 2.2.7.1'
 
 group :production do
-  gem 'pg'
+  gem 'pg', '~> 0.19.0'
 end
 
 group :development, :test do
