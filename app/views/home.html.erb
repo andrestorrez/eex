@@ -1,0 +1,52 @@
+<div class="ui grid middle aligned center aligned internally celled text container" style="height: 100vh;">
+	<div class="sixteen wide column">
+
+		<h1 class="logo">Or-be</h1>
+		<div class="ui exr inline form">
+			<div class="fields">
+				<div class="seven wide field">
+					<div class="ui labeled small input">
+						<div id="drop-currency1" class="ui search selection compact dropdown label">
+						  <%= hidden_field_tag :currency1 %>
+						  <i class="dropdown icon"></i>
+						  <div class="default text"></div>
+						  <div class="menu">
+						    <%= currencies_options %>
+						  </div>
+						</div>
+						<%= text_field_tag :amount1, 1 %>
+					</div>
+				</div>
+				<div class="two wide field"><h1 class="ui grey header">=</h1></div>
+				<div class="seven wide field">
+				<div class="ui right labeled small input">
+					<%= text_field_tag :amount2, 0 %>
+					<div id="drop-currency2" class="ui search selection compact dropdown label">
+						<%= hidden_field_tag :currency2 %>
+					  <i class="dropdown icon"></i>
+					  <div class="default text"></div>
+					  <div class="menu">
+					    <%= currencies_options %>
+					  </div>
+					</div>
+					
+				</div>
+				</div>
+			</div>
+		</div>
+		<div class="ui divider"></div>
+		<%= link_to "/historical_data", class: "ui link left floated blue button icon button" do%>
+			<i class="history icon"></i> Historical 
+		<%end%>
+		<%= link_to "/list", class: "ui link left floated teal button" do%>
+			<i class="list icon"></i> List Excahnge Rates
+		<%end%>
+	</div>
+</div>
+<script type="text/javascript">
+	window.setTimeout(function(){
+		$("#drop-currency2").dropdown('set selected', 'USD')
+		$("#drop-currency1").dropdown('set selected', 'GBP');
+		
+	},300);
+</script>

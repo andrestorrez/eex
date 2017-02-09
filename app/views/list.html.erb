@@ -1,0 +1,55 @@
+<div class="ui segment">
+<%= link_to "Go Back", root_path, class: "ui yellow button" %>
+<div class="ui divider"></div>
+<%= form_tag "", method: :get do %>
+<div class="ui form">
+	
+	<div class="four fields">
+		<div class="field">
+			 <label>Currency</label>
+			<div id="drop-currency1" class="ui search selection compact dropdown label">
+			  <%= hidden_field_tag :currency %>
+			  <i class="dropdown icon"></i>
+			  <div class="default text"></div>
+			  <div class="menu">
+			    <%= currencies_options %>
+			  </div>
+			</div>
+		</div>
+    <div class="field">
+      <label>Start date</label>
+      <div class="ui calendar" id="rangestart">
+        <div class="ui input left icon">
+          <i class="calendar icon"></i>
+          <input id="startd" name="start_date" type="text" placeholder="Start" readonly="" value="<%= @start_date %>">
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>End date</label>
+      <div class="ui calendar" id="rangeend">
+        <div class="ui input left icon">
+          <i class="calendar icon"></i>
+          <input id="endd" name="end_date" type="text" placeholder="End" readonly="" value="<%= @end_date %>">
+        </div>
+      </div>
+    </div>
+    <div class="field">
+    <label style="color: white;">-</label>
+    <%= button_tag class: "ui green icon button" do %>
+    	<i class="ui search icon"></i>
+    <%end%>
+    </div>
+  </div>
+</div>
+<%end%>
+</div>
+<div class="ui segment">
+
+</div>
+<script type="text/javascript">
+	window.setTimeout(function(){
+    $("#drop-currency1").dropdown('set selected', '<%= @base %>');
+    
+  },300);
+</script>

@@ -1,0 +1,222 @@
+<div class="ui one column grid">
+  <div class="column ui segment">
+  <%= link_to "Go Back", root_path, class: "ui yellow button" %>
+  <div class="ui divider"></div>
+  <div class="ui small form">
+    <div class="two fields">
+      <div class="field">
+        <label>Base</label>
+        <div id="drop-currency1" class="ui search selection compact dropdown label">
+          <%= hidden_field_tag :currency_1 %>
+          <i class="dropdown icon"></i>
+          <div class="default text"></div>
+          <div class="menu">
+            <%= currencies_options %>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Versus</label>
+        <div id="drop-currency2" class="ui search selection compact dropdown label">
+          <%= hidden_field_tag :currency_2 %>
+          <i class="dropdown icon"></i>
+          <div class="default text"></div>
+          <div class="menu">
+            <%= currencies_options %>
+          </div>
+          </div>
+      </div>
+    </div>
+    <div class="two fields">
+      <div class="field">
+        <label>Start date</label>
+        <div class="ui calendar" id="rangestart">
+          <div class="ui input left icon">
+            <i class="calendar icon"></i>
+            <input id="startd" type="text" placeholder="Start" readonly="" value="<%= @start_date %>">
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>End date</label>
+        <div class="ui calendar" id="rangeend">
+          <div class="ui input left icon">
+            <i class="calendar icon"></i>
+            <input id="endd" type="text" placeholder="End" readonly="" value="<%= @end_date %>">
+          </div>
+        </div>
+      </div>
+    </div>
+    <%= link_to "1 week ago", "?period", class: "period-link ui tiny #{'active blue' unless check_period?(2) || check_period?(3)} button" %>
+    <%= link_to "1 month ago", "?period=2", class: "period-link ui tiny #{'active blue' if check_period?(2)} button" %>
+    <%= link_to "3 months ago", "?period=3",  class: "period-link ui tiny #{'active blue' if check_period?(3)} button" %>
+
+  </div>
+  </div>
+  <div class="column">
+    <div class="ui center aligned graph segment">
+      <svg id="#graph" width="960" height="400" preserveAspectRatio="xMidYMid"></svg>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  window.setTimeout(function(){
+    $("#drop-currency2").dropdown('set selected', '<%= @versus%>')
+    $("#drop-currency1").dropdown('set selected', '<%= @base %>');
+    
+  },300);
+
+  $(".period-link").on("click", function(e){
+    e.preventDefault();
+    var url=e.currentTarget.href,
+    separator = (url.indexOf("?")===-1)?"?":"&",
+    newParam=separator;
+    newUrl=url+separator+"base="+$("#currency_1").val();
+    newUrl+=separator+"versus="+$("#currency_2").val();;
+    //window.location.href = newUrl;
+    Turbolinks.visit(newUrl);
+  });
+</script>
+
+<script type="text/javascript">
+  var today = new Date();
+  $('#rangestart').calendar({
+    type: 'date',
+    endCalendar: $('#rangeend'),
+    minDate: new Date(2000, 0, 1),
+    maxDate: new Date(today.getFullYear(),today.getMonth(), today.getDate()),
+  });
+  $('#rangeend').calendar({
+    type: 'date',
+    startCalendar: $('#rangestart'),
+    minDate: new Date(2000, 0, 1),
+    maxDate: new Date(today.getFullYear(),today.getMonth(), today.getDate()),
+    onChange: function(end_date){
+      if (end_date && (start_date=$("#rangestart").calendar("get date"))){
+        initialize_graph()
+        $(".ui.active.button").removeClass("active blue")
+      }
+    }
+  });
+
+  $("#currency_1, #currency_2").on("change", function(){
+    if ((end_date=$("#rangeend").calendar("get date")) && (start_date=$("#rangestart").calendar("get date"))){
+        //d3.select("svg").remove();
+        //base_versus = $("#currency_1").val()+"-"+$("#currency_2").val();
+        initialize_graph()//(base_versus, to_default_format(start_date), to_default_format(end_date));
+    }
+  });
+</script>
+
+<script type="text/javascript">
+
+  var svg = d3.select("svg"),
+    margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom,
+    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  var parseTime = d3.timeParse("%b-%d-%y");
+
+  var x = d3.scaleTime()
+      .rangeRound([0, width]);
+
+  var y = d3.scaleLinear()
+      .rangeRound([height, 0]);
+
+  var area = d3.area()
+      .x(function(d) { return x(d.date); })
+      .y1(function(d) { return y(d.close); });
+
+function initialize_graph(base_versus, start_date, end_date){
+  if ($("#currency_1").val() != "" && $("#currency_2").val() != "" &&
+    (end_date=$("#rangeend").calendar("get date")) && (start_date=$("#rangestart").calendar("get date"))){
+        //d3.select("svg").remove();
+    base_versus = $("#currency_1").val()+"-"+$("#currency_2").val();
+    start_date =  to_default_format(start_date)
+    end_date = to_default_format(end_date)
+        //initialize_graph(base_versus, to_default_format(start_date), to_default_format(end_date));
+
+    $(".ui.graph.segment").addClass("loading");
+    d3.json("/historical/"+base_versus+"?start="+start_date+"&end="+end_date, draw_graph, function(error, data) {
+      if (error) throw error;
+
+      console.log("After- ");
+      console.log(data);
+    });
+  }
+  
+}
+
+function to_default_format(date){
+  month = date.getMonth()+1
+  month = (month < 10 ? "0": "")+month.toString();
+  day = date.getDate();
+  day = (day < 10 ? "0" : "")+day.toString();
+  return month+"-"+day+"-"+date.getFullYear();
+}
+
+function draw_graph(d){
+  data = []
+  for (var k in d.rates){
+    value = d.rates[k]
+    date = k.substr(-4)+"-"+k.substr(0,2)+k.substr(-8,3);
+    data.push({date: (new Date(date)), close: value})
+  }
+
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+  y.domain([0, d3.max(data, function(d) { return d.close; })]);
+  area.y0(y(0));
+
+  g.selectAll("path").remove();
+  g.selectAll("g").remove();
+  g.selectAll("text").remove();
+
+  g.append("path")
+      .datum(data)
+      .attr("fill", "steelblue")
+      .attr("d", area);
+
+  g.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  g.append("g")
+      .call(d3.axisLeft(y))
+    .append("text")
+      .attr("fill", "#000")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text("Rate");
+  $(".ui.loading.segment").removeClass("loading");
+  return data;
+}
+
+function resize() {
+  /* Update graph using new width and height (code below) */
+  /* Find the new window dimensions */
+  var width = parseInt(d3.select("#graph").style("width")) - margin*2,
+  height = parseInt(d3.select("#graph").style("height")) - margin*2;
+
+  /* Update the range of the scale with new width/height */
+  xScale.range([0, width]).nice(d3.time.year);
+  yScale.range([height, 0]).nice();
+
+  /* Update the axis with the new scale */
+  graph.select('.x.axis')
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+
+  graph.select('.y.axis')
+    .call(yAxis);
+
+  /* Force D3 to recalculate and update the line */
+  graph.selectAll('.line')
+    .attr("d", line);
+}
+
+//d3.select(window).on('resize', resize); 
+
+</script>
