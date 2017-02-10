@@ -61,8 +61,12 @@
 </div>
 <script type="text/javascript">
   window.setTimeout(function(){
-    $("#drop-currency2").dropdown('set selected', '<%= @versus%>')
-    $("#drop-currency1").dropdown('set selected', '<%= @base %>');
+    c1_drop = $("#drop-currency1");
+    c2_drop = $("#drop-currency2");
+    if (c1_drop.dropdown("get value")=="" || c2_drop.dropdown("get value")==""){
+      c2_drop.dropdown('set selected', '<%= @versus %>')
+      c1_drop.dropdown('set selected', '<%= @base %>')
+    }
     
   },300);
 

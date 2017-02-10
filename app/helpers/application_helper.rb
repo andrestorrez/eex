@@ -1,5 +1,11 @@
 module ApplicationHelper
-	CURRENCIES = {"AUD" => "australia", "BGN" => "bulgaria", "BRL" => "brazil", "CAD" => "canada", "CHF" => "liechtenstein", "CNY" => "china", "CZK" => "czech republic", "DKK" => "denmark", "EUR"=>"european union", "GBP" => "united kingdom", "HKD" => "hong kong", "HRK" => "croatia", "HUF" => "hungary", "IDR" => "indonesia", "ILS" => "israel", "INR" => "india", "JPY" => "japan", "KRW" => "south korea", "MXN" => "mexico", "MYR" => "malaysia", "NOK" => "norway", "NZD" => "new zealand", "PHP" => "philippines", "PLN" => "poland", "RON" => "romania", "RUB" => "russia", "SEK" => "sweden", "SGD" => "singapore", "THB" => "thailand", "TRY" => "turkey", "USD" => "united states", "ZAR" => "south africa"}
+	CURRENCIES = {"ARS"=> "argentina", "AUD" => "australia", "BGN" => "bulgaria", "BRL" => "brazil", "CAD" => "canada",
+	 "CHF" => "liechtenstein", "CNY" => "china", "CZK" => "czech republic", "DKK" => "denmark", "DZD"=> "algeria",
+	  "EUR"=>"european union", "GBP" => "united kingdom", "HKD" => "hong kong", "HRK" => "croatia", "HUF" => "hungary",
+	   "IDR" => "indonesia", "ILS" => "israel", "INR" => "india", "JPY" => "japan", "KRW" => "south korea",  "MAD"=> "morocco", 
+	   "MXN" => "mexico", "MYR" => "malaysia", "NOK" => "norway", "NZD" => "new zealand", "PHP" => "philippines", "PLN" => "poland",
+	     "RON" => "romania", "RUB" => "russia", "SEK" => "sweden", "SGD" => "singapore", "THB" => "thailand", "TRY" => "turkey", 
+	     "TWD"=> "taiwan", "USD" => "united states", "ZAR" => "south africa"}
 
 
 	def currencies_options

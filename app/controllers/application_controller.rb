@@ -25,7 +25,7 @@ class ApplicationController < ActionController::Base
   def list
     dformat = '%b %d, %Y'
     @base = params[:base] || 'GBP'
-    @start_date = (Time.now - 7.day).strftime(dformat)
+    @start_date = (Time.now).strftime(dformat)
     @end_date = Time.now.strftime(dformat)
     render '/list'
   end

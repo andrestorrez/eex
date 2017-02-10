@@ -17,7 +17,7 @@
 			</div>
 		</div>
     <div class="field">
-      <label>Start date</label>
+      <label>Date</label>
       <div class="ui calendar" id="rangestart">
         <div class="ui input left icon">
           <i class="calendar icon"></i>
@@ -25,27 +25,44 @@
         </div>
       </div>
     </div>
-    <div class="field">
-      <label>End date</label>
-      <div class="ui calendar" id="rangeend">
-        <div class="ui input left icon">
-          <i class="calendar icon"></i>
-          <input id="endd" name="end_date" type="text" placeholder="End" readonly="" value="<%= @end_date %>">
-        </div>
-      </div>
-    </div>
-    <div class="field">
-    <label style="color: white;">-</label>
-    <%= button_tag class: "ui green icon button" do %>
-    	<i class="ui search icon"></i>
-    <%end%>
-    </div>
   </div>
 </div>
 <%end%>
 </div>
-<div class="ui segment">
-
+<div class="ui equal width stackable segment grid">
+	<div class="column">
+	<div class="ui table-list ">
+		<table class="ui compact small currency-list fixed striped collapsing table uno">
+			<thead>
+				<th>Currency</th>
+				<th>Rate</th>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+	</div>
+	<div class="column">
+	<div class="ui table-list dos">
+		<table class="ui compact small currency-list fixed striped collapsing table dos">
+			<thead>
+				<th>Currency</th>
+				<th>Rate</th>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+	</div>
+	<div class="column">
+	<div class="ui table-list tres">
+		<table class="ui compact small currency-list fixed striped collapsing table tres">
+			<thead>
+				<th>Currency</th>
+				<th>Rate</th>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+	</div>
 </div>
 <script type="text/javascript">
 	window.setTimeout(function(){

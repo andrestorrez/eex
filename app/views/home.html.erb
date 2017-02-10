@@ -36,7 +36,7 @@
 		</div>
 		<div class="ui divider"></div>
 		<%= link_to "/historical_data", class: "ui link left floated blue button icon button" do%>
-			<i class="history icon"></i> Historical 
+			<i class="history icon"></i> Historical Data
 		<%end%>
 		<%= link_to "/list", class: "ui link left floated teal button" do%>
 			<i class="list icon"></i> List Excahnge Rates
@@ -45,8 +45,14 @@
 </div>
 <script type="text/javascript">
 	window.setTimeout(function(){
-		$("#drop-currency2").dropdown('set selected', 'USD')
-		$("#drop-currency1").dropdown('set selected', 'GBP');
+		c1_drop = $("#drop-currency1");
+		c2_drop = $("#drop-currency2");
+		if (c1_drop.dropdown("get value")=="" || c2_drop.dropdown("get value")==""){
+			c2_drop.dropdown('set selected', 'USD')
+			c1_drop.dropdown('set selected', 'GBP')
+			
+		}
+			
 		
 	},300);
 </script>
