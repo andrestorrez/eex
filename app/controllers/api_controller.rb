@@ -1,4 +1,4 @@
-class ApiController < ApplicationController
+class ApiController < ActionController::Base
 
 	DEFAULT_BASE = "EUR"
 	BASE_URL = "https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D.%{versus}.#{DEFAULT_BASE}.SP00.A?startPeriod=%{start_date}&endPeriod=%{end_date}"
@@ -10,15 +10,25 @@ class ApiController < ApplicationController
 		@base = query[0].try(:upcase)
 		@versus = query[1].try(:upcase)
 		@rates = {}
-		@date = Date.strptime(params[:date], API_DATE_FORMAT) unless params[:date].blank?
-		@date = get_valid_date(@date ? @date : Time.now)
+		@date = params[:date].blank? ? Time.now : Date.strptime(params[:date], API_DATE_FORMAT)
+		str_date = get_valid_date(@date)
 
 		is_default_base = @base == DEFAULT_BASE
 		real_vs = is_default_base || @versus.blank? ? nil : "#{is_default_base ? nil : @base}#{@base && @versus && !is_default_base ? '+': nil}#{@versus ? "#{@versus}" : nil}"
-		url_request = BASE_URL % {versus: real_vs, start_date: @date, end_date: @date }
+		url_request = BASE_URL % {versus: real_vs, start_date: str_date, end_date: str_date }
 
-		
-		if @base && response = open_request(url_request)
+		response = open_request(url_request)
+		c = 0
+		while response && !response.first do 
+			break if c > 4
+			@date = @date - 1.day
+			str_date = get_valid_date(@date)
+			url_request = BASE_URL % {versus: real_vs, start_date: str_date, end_date: str_date }
+			response = open_request(url_request)
+			c+=1
+		end
+
+		if @base && response && response.first
 			currency = nil
 			rate = nil
 			response.each do |line|
@@ -35,7 +45,8 @@ class ApiController < ApplicationController
 			end
 			#unless is_default_base
 				@rates[DEFAULT_BASE] = 1
-				base_rate = 1 / @rates[@base]
+				@base = DEFAULT_BASE unless @rates[@base]
+				base_rate = 1 / (@rates[@base]) 
 				@rates.each do |k, v|
 					if @versus && k != @versus || @base == k
 						@rates.delete(k)
@@ -44,7 +55,15 @@ class ApiController < ApplicationController
 					end
 				end
 			#end
-			@date = Date.strptime(@date).strftime(API_DATE_FORMAT)
+			@date = str_date
+			respond_to do |format|
+				unless params[:callback].blank?
+					format.json {render json: render_to_string("latest", format: :json), callback: params[:callback]}
+				else
+					format.json 
+				end
+			end
+			
 		else
 			render json: {message: "Wrong parameters"}, status: 422
 		end
@@ -104,6 +123,7 @@ class ApiController < ApplicationController
 			#unless is_default_base
 				tmp_rates.each do |k, v|
 					v[DEFAULT_BASE] = 1
+					#@base = DEFAULT_BASE unless @rates[@base]
 					base_rate = 1 / v[@base]
 					
 					v.each do |kk, vv|
@@ -120,7 +140,13 @@ class ApiController < ApplicationController
 				@date = @date.strftime(API_DATE_FORMAT)
 			end
 				
-			render 'latest'	
+			respond_to do |format|
+				unless params[:callback].blank?
+					format.json {render json: render_to_string("latest", format: :json), callback: params[:callback]}
+				else
+					format.json {render json: render_to_string("latest")}
+				end
+			end
 		else
 			render json: {message: "Wrong parameters", code: "422"}, status: 422
 		end
@@ -144,7 +170,10 @@ class ApiController < ApplicationController
 
 	def open_request(url)
 		begin
-			return open(url)
+			p "Making Request....."
+			p url
+			response = open(url)
+			return response
 		rescue => e
 			return nil
 		end

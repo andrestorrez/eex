@@ -35,7 +35,7 @@ $(document).on("turbolinks:load", function(){
 	});
 
 	$("#currency2").on("change", function(){
-		get_exr(2);
+		get_exr(1);
 	});
 	
 	function get_exr(order){
